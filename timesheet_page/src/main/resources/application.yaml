@@ -1,0 +1,11 @@
+server:
+  port: 3333
+spring:
+  application:
+    name: timesheet_page
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
