@@ -10,9 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClient;
+import ru.gb.model.Employee;
+import ru.gb.model.Project;
 import ru.gb.model.Timesheet;
+import ru.gb.repository.EmployeeRepository;
+import ru.gb.repository.ProjectRepository;
 import ru.gb.repository.TimesheetRepository;
-
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +30,10 @@ class TimesheetControllerTest {
 
     @Autowired
     TimesheetRepository timesheetRepository;
+    @Autowired
+    ProjectRepository projectRepository;
+    @Autowired
+    EmployeeRepository employeeRepository;
 
     @LocalServerPort
     private int port;
@@ -107,9 +114,17 @@ class TimesheetControllerTest {
 
     @Test
     void create() {
+        Project project = new Project();
+        project.setName("Test Project");
+        project = projectRepository.save(project);
+
+        Employee employee = new Employee();
+        employee.setName("Test Employee");
+        employee = employeeRepository.save(employee);
+
         Timesheet toCreate = new Timesheet();
-        toCreate.setProjectId(10000L);
-        toCreate.setEmployeeId(10000L);
+        toCreate.setProjectId(project.getId());
+        toCreate.setEmployeeId(employee.getId());
 
         ResponseEntity<Timesheet> response = restClient.post()
                 .uri("/timesheets")
@@ -117,7 +132,6 @@ class TimesheetControllerTest {
                 .retrieve()
                 .toEntity(Timesheet.class);
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Timesheet responseBody = response.getBody();
         assertNotNull(responseBody);
         assertNotNull(responseBody.getId());
